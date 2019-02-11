@@ -1,6 +1,7 @@
 package inmet
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -94,14 +95,15 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 		return nil, err
 	}
 
-	var buf *strings.Reader
+	var buf io.ReadWriter
 	if body != nil {
+		buf = new(bytes.Buffer)
 		form := url.Values{}
 		v := reflect.ValueOf(body).Elem()
 		for i := 0; i < v.NumField(); i++ {
 			form.Add(v.Type().Field(i).Tag.Get("json"), v.Field(i).String())
 		}
-		buf = strings.NewReader(form.Encode())
+		buf.Write([]byte(form.Encode()))
 	}
 
 	req, err := http.NewRequest(method, u.String(), buf)
