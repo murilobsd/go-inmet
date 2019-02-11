@@ -29,6 +29,20 @@ func main() {
 	// }
 
 	// get cad final
-	cadFinal, _, _ := client.CAD.GetFinal(context.Background(), 1, "2036")
-	fmt.Println("Cad Final: ", *cadFinal)
+	// cadFinal, _, _ := client.CAD.GetFinal(context.Background(), 1, "2036")
+	// fmt.Println("Cad Final: ", *cadFinal)
+
+	// get bhc loss productivity
+	bhcLossProdRequest := &inmet.BHCLossProdRequest{
+		DatePlanting: "01/01/2019",
+		CultureCode:  "2036",
+		StationCode:  "5571112550380100001",
+		SoilCode:     "1",
+		CADFinal:     "50.4",
+	}
+
+	bhcs, _, _ := client.BHC.BHCLossProdGet(context.Background(), bhcLossProdRequest)
+	for _, bhc := range bhcs {
+		fmt.Printf("%v\n", bhc.ETP)
+	}
 }
