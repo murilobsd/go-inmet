@@ -37,6 +37,7 @@ type Client struct {
 	Soil    *SoilService
 	Station *StationService
 	BHC     *BHCService
+	Culture *CultureService
 }
 
 type service struct {
@@ -79,6 +80,7 @@ func NewClient(httpClient *http.Client) *Client {
 	c.Soil = &SoilService{client: c}
 	c.Station = &StationService{client: c}
 	c.BHC = &BHCService{client: c}
+	c.Culture = &CultureService{client: c}
 	return c
 }
 
