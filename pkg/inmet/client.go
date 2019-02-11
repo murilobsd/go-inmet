@@ -1,7 +1,6 @@
 package inmet
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -95,15 +94,14 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 		return nil, err
 	}
 
-	var buf io.ReadWriter
+	var buf *strings.Reader
 	if body != nil {
-		buf = new(bytes.Buffer)
-		enc := json.NewEncoder(buf)
-		enc.SetEscapeHTML(false)
-		err := enc.Encode(body)
-		if err != nil {
-			return nil, err
+		form := url.Values{}
+		v := reflect.ValueOf(body).Elem()
+		for i := 0; i < v.NumField(); i++ {
+			form.Add(v.Type().Field(i).Tag.Get("json"), v.Field(i).String())
 		}
+		buf = strings.NewReader(form.Encode())
 	}
 
 	req, err := http.NewRequest(method, u.String(), buf)
@@ -111,7 +109,7 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 		return nil, err
 	}
 	if body != nil {
-		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
 	}
 
 	if c.UserAgent != "" {
@@ -154,7 +152,8 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 		return nil, err
 	}
 	defer resp.Body.Close()
-
+	// body, _ := ioutil.ReadAll(resp.Body)
+	// fmt.Println(string(body))
 	response := newResponse(resp)
 
 	err = CheckResponse(resp)
