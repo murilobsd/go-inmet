@@ -23,8 +23,12 @@ func main() {
 	// }
 
 	// list all soils type
-	soilsType, _, _ := client.Soil.TypeList(context.Background())
-	for _, soil := range soilsType {
-		fmt.Printf("%v\n", soil.Description)
-	}
+	// soilsType, _, _ := client.Soil.TypeList(context.Background())
+	// for _, soil := range soilsType {
+	// 	fmt.Printf("%v\n", soil.Description)
+	// }
+
+	// get cad final
+	cadFinal, _, _ := client.CAD.GetFinal(context.Background(), 1, "2036")
+	fmt.Println("Cad Final: ", *cadFinal)
 }
